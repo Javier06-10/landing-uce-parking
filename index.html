@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCE Parking | Gestión Inteligente de Estacionamientos</title>
+    <meta name="description" content="Potencia tu estacionamiento con UCE Parking. Gestión automatizada, suscripciones y control en tiempo real con alta tecnología.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon"><i data-lucide="parking-circle"></i></span>
+                <span class="logo-text">UCE<span>Parking</span></span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#caracteristicas">Características</a></li>
+                    <li><a href="#precios">Precios</a></li>
+                    <li><a href="#" class="btn-secondary">Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="inicio" class="hero">
+            <div class="container">
+                <div class="hero-content reveal">
+                    <h1 class="gradient-text">El Futuro del Parking es Inteligente</h1>
+                    <p class="subtitle">Optimiza tu infraestructura, automatiza accesos y maximiza tus ingresos con nuestra plataforma de gestión de próxima generación.</p>
+                    <div class="hero-btns">
+                        <a href="#precios" class="btn-primary">Empezar ahora</a>
+                        <a href="#caracteristicas" class="btn-outline">Ver funciones</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="caracteristicas" class="features">
+            <div class="container">
+                <div class="section-header reveal">
+                    <h2>Potencia sin Límites</h2>
+                    <p>Todo lo que necesitas para escalar tu negocio de estacionamiento.</p>
+                </div>
+                <div class="feature-grid">
+                    <div class="feature-card reveal" style="transition-delay: 0.1s;">
+                        <div class="feature-icon"><i data-lucide="zap"></i></div>
+                        <h3>Acceso LPR Veloz</h3>
+                        <p>Detección automática de patentes con inteligencia artificial para entradas sin fricción.</p>
+                    </div>
+                    <div class="feature-card reveal" style="transition-delay: 0.2s;">
+                        <div class="feature-icon"><i data-lucide="shield-check"></i></div>
+                        <h3>Seguridad Avanzada</h3>
+                        <p>Control total de dispositivos y registros de auditoría en tiempo real.</p>
+                    </div>
+                    <div class="feature-card reveal" style="transition-delay: 0.3s;">
+                        <div class="feature-icon"><i data-lucide="bar-chart-3"></i></div>
+                        <h3>Analytics Pro</h3>
+                        <p>Reportes detallados y predicciones de ocupación basadas en datos reales.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="precios" class="pricing">
+            <div class="container">
+                <div class="section-header reveal">
+                    <h2>Planes que Crecerán Contigo</h2>
+                    <p>Elige el nivel de control que tu estacionamiento merece.</p>
+                </div>
+                <div class="pricing-grid">
+                    <!-- Basic Plan -->
+                    <div class="pricing-card reveal" style="transition-delay: 0.1s;">
+                        <div class="plan-name">Básico</div>
+                        <div class="plan-price">$29<span>/mes</span></div>
+                        <ul class="plan-features">
+                            <li><i data-lucide="check"></i> 1 Zona de Parking</li>
+                            <li><i data-lucide="check"></i> Hasta 50 Plazas</li>
+                            <li><i data-lucide="check"></i> 5 Dispositivos</li>
+                            <li><i data-lucide="check"></i> 3 Usuarios</li>
+                        </ul>
+                        <button class="btn-plan" data-plan-id="1">Suscribirse</button>
+                    </div>
+
+                    <!-- Pro Plan (Recommended) -->
+                    <div class="pricing-card recommended reveal" style="transition-delay: 0.2s;">
+                        <div class="badge">Recomendado</div>
+                        <div class="plan-name">Profesional</div>
+                        <div class="plan-price">$79<span>/mes</span></div>
+                        <ul class="plan-features">
+                            <li><i data-lucide="check"></i> 5 Zonas de Parking</li>
+                            <li><i data-lucide="check"></i> Hasta 200 Plazas</li>
+                            <li><i data-lucide="check"></i> 20 Dispositivos</li>
+                            <li><i data-lucide="check"></i> 10 Usuarios</li>
+                            <li><i data-lucide="check"></i> Soporte Prioritario</li>
+                        </ul>
+                        <button class="btn-plan primary" data-plan-id="2">Empezar PRO</button>
+                    </div>
+
+                    <!-- Enterprise Plan -->
+                    <div class="pricing-card reveal" style="transition-delay: 0.3s;">
+                        <div class="plan-name">Empresarial</div>
+                        <div class="plan-price">$199<span>/mes</span></div>
+                        <ul class="plan-features">
+                            <li><i data-lucide="check"></i> Zonas Ilimitadas</li>
+                            <li><i data-lucide="check"></i> Plazas Ilimitadas</li>
+                            <li><i data-lucide="check"></i> Dispositivos Ilimitados</li>
+                            <li><i data-lucide="check"></i> Usuarios Ilimitados</li>
+                            <li><i data-lucide="check"></i> API Personalizada</li>
+                        </ul>
+                        <button class="btn-plan" data-plan-id="3">Contactar</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="logo-text">UCE<span>Parking</span></span>
+                    <p>La revolución del estacionamiento inteligente.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Sistema</h4>
+                    <ul>
+                        <li><a href="#">Documentación</a></li>
+                        <li><a href="#">Estado de Red</a></li>
+                        <li><a href="#">Seguridad</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 UCE Parking. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
