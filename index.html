@@ -3,164 +3,675 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UCE Parking | Gestión Inteligente de Estacionamientos</title>
-    <meta name="description" content="Potencia tu estacionamiento con UCE Parking. Gestión automatizada, suscripciones y control en tiempo real con alta tecnología.">
-    
-    <!-- Google Fonts -->
+    <title>UCE Parking | Parqueo Inteligente en Tiempo Real</title>
+    <meta name="description" content="La forma moderna de gestionar estacionamientos universitarios. Sistema inteligente con IA, sensores IoT y monitoreo en tiempo real.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
-    <!-- Lucide Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- Styles -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Background Elements -->
-    <div class="bg-glow bg-glow-1"></div>
-    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-gradient-spot bg-spot-1"></div>
+    <div class="bg-gradient-spot bg-spot-2"></div>
+    <div class="bg-grid"></div>
 
-    <header class="navbar">
-        <div class="container">
+    <!-- ══ TOAST ══════════════════════════════════════ -->
+    <div class="toast" id="toast">
+        <span id="toast-icon">✅</span>
+        <span id="toast-msg">Mensaje</span>
+        <button class="toast-close" onclick="hideToast()">✕</button>
+    </div>
+
+    <!-- ══ MODAL LOGIN ════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-login">
+        <div class="modal glass-panel">
+            <button class="modal-x" onclick="closeModal('modal-login')">✕</button>
+            <h3 class="text-gradient">Bienvenido de vuelta</h3>
+            <p class="modal-subtitle">Inicia sesión para acceder a tu panel.</p>
+            <div class="form-group">
+                <label>Correo electrónico</label>
+                <input type="email" id="login-email" placeholder="admin@empresa.com"/>
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" id="login-password" placeholder="••••••••"/>
+                <div class="form-err" id="login-err"></div>
+            </div>
+            <button class="btn btn-primary w-full mt-4" id="btn-login" onclick="doLogin()">Iniciar Sesión</button>
+            <div class="modal-footer">
+                <span>¿No tienes cuenta?</span>
+                <a onclick="switchModal('modal-login','modal-register')">Regístrate gratis →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL REGISTRO ═════════════════════════════ -->
+    <div class="modal-overlay" id="modal-register">
+        <div class="modal glass-panel">
+            <button class="modal-x" onclick="closeModal('modal-register')">✕</button>
+            <h3 class="text-gradient">Crear cuenta</h3>
+            <p class="modal-subtitle">14 días gratis, sin tarjeta de crédito.</p>
+            <div class="form-group">
+                <label>Nombre completo</label>
+                <input type="text" id="reg-nombre" placeholder="Juan Pérez"/>
+            </div>
+            <div class="form-group">
+                <label>Correo electrónico</label>
+                <input type="email" id="reg-email" placeholder="juan@empresa.com"/>
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" id="reg-password" placeholder="Mínimo 8 caracteres"/>
+                <div class="form-err" id="reg-err"></div>
+            </div>
+            <button class="btn btn-primary w-full mt-4" id="btn-register" onclick="doRegister()">Crear cuenta gratis</button>
+            <div class="modal-footer">
+                <span>¿Ya tienes cuenta?</span>
+                <a onclick="switchModal('modal-register','modal-login')">Iniciar sesión →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. NAVBAR -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
             <div class="logo">
-                <span class="logo-icon"><i data-lucide="parking-circle"></i></span>
+                <i data-lucide="parking-circle" class="logo-icon"></i>
                 <span class="logo-text">UCE<span>Parking</span></span>
             </div>
-            <nav>
-                <ul>
-                    <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="#caracteristicas">Características</a></li>
-                    <li><a href="#precios">Precios</a></li>
-                    <li><a href="#" class="btn-secondary">Login</a></li>
-                </ul>
-            </nav>
+            <ul class="nav-links">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="#precios">Precios</a></li>
+            </ul>
+            <div class="nav-actions">
+                <div id="nav-unauth">
+                    <a href="#" class="btn btn-secondary" onclick="openModal('modal-login'); return false;">Iniciar sesión</a>
+                </div>
+                <div id="nav-auth" style="display:none; gap: 1rem; align-items: center;">
+                    <a href="http://localhost:3000" class="btn btn-primary btn-glow" target="_blank">Ir al Panel</a>
+                    <a href="#" class="btn btn-secondary" onclick="doLogout(); return false;">Salir</a>
+                </div>
+            </div>
+            <button class="mobile-menu-btn" id="mobile-menu-btn">
+                <i data-lucide="menu"></i>
+            </button>
         </div>
-    </header>
+    </nav>
 
-    <main>
-        <!-- Hero Section -->
-        <section id="inicio" class="hero">
-            <div class="container">
-                <div class="hero-content reveal">
-                    <h1 class="gradient-text">El Futuro del Parking es Inteligente</h1>
-                    <p class="subtitle">Optimiza tu infraestructura, automatiza accesos y maximiza tus ingresos con nuestra plataforma de gestión de próxima generación.</p>
-                    <div class="hero-btns">
-                        <a href="#precios" class="btn-primary">Empezar ahora</a>
-                        <a href="#caracteristicas" class="btn-outline">Ver funciones</a>
+    <!-- 2. HERO SECTION -->
+    <section id="inicio" class="hero">
+        <div class="container hero-container">
+            <div class="hero-content reveal">
+                <div class="badge-pill">
+                    <span class="badge-icon">🚗</span>
+                    <span>Sistema Inteligente de Parqueo Universitario</span>
+                </div>
+                <h1 class="hero-title">
+                    Encuentra estacionamiento en segundos con <span class="text-gradient">IA y monitoreo en tiempo real</span>
+                </h1>
+                <p class="hero-subtitle">
+                    UCE Parking automatiza la gestión de parqueos mediante sensores IoT, análisis inteligente y reservas en tiempo real.
+                </p>
+                <div class="hero-buttons">
+                    <a href="http://localhost:3000" target="_blank" class="btn btn-primary btn-lg btn-glow">Ver Demo</a>
+                    <a href="#dashboard" class="btn btn-secondary btn-lg">Explorar Dashboard</a>
+                </div>
+                <div class="hero-metrics">
+                    <span><i data-lucide="check-circle-2"></i> Disponibilidad en tiempo real</span>
+                    <span><i data-lucide="check-circle-2"></i> Sensores inteligentes</span>
+                    <span><i data-lucide="check-circle-2"></i> Alertas automáticas</span>
+                    <span><i data-lucide="check-circle-2"></i> Gestión centralizada</span>
+                </div>
+            </div>
+            <div class="hero-mockup reveal-right">
+                <div class="glass-panel mockup-panel">
+                    <div class="mockup-header">
+                        <div class="dots"><span></span><span></span><span></span></div>
+                        <div class="mockup-title">UCE Parking Dashboard</div>
+                    </div>
+                    <div class="mockup-body">
+                        <!-- Mockup visual representation -->
+                        <div class="mockup-map">
+                            <div class="parking-spot green">A1</div>
+                            <div class="parking-spot red">A2</div>
+                            <div class="parking-spot green">A3</div>
+                            <div class="parking-spot red">B1</div>
+                            <div class="parking-spot green pulse-glow">B2</div>
+                            <div class="parking-spot red">B3</div>
+                        </div>
+                        <div class="mockup-stats">
+                            <div class="m-stat">
+                                <span class="m-val">42</span>
+                                <span class="m-lbl">Disponibles</span>
+                            </div>
+                            <div class="m-stat">
+                                <span class="m-val">98%</span>
+                                <span class="m-lbl">Precisión</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Features Section -->
-        <section id="caracteristicas" class="features">
-            <div class="container">
-                <div class="section-header reveal">
-                    <h2>Potencia sin Límites</h2>
-                    <p>Todo lo que necesitas para escalar tu negocio de estacionamiento.</p>
-                </div>
-                <div class="feature-grid">
-                    <div class="feature-card reveal" style="transition-delay: 0.1s;">
-                        <div class="feature-icon"><i data-lucide="zap"></i></div>
-                        <h3>Acceso LPR Veloz</h3>
-                        <p>Detección automática de patentes con inteligencia artificial para entradas sin fricción.</p>
-                    </div>
-                    <div class="feature-card reveal" style="transition-delay: 0.2s;">
-                        <div class="feature-icon"><i data-lucide="shield-check"></i></div>
-                        <h3>Seguridad Avanzada</h3>
-                        <p>Control total de dispositivos y registros de auditoría en tiempo real.</p>
-                    </div>
-                    <div class="feature-card reveal" style="transition-delay: 0.3s;">
-                        <div class="feature-icon"><i data-lucide="bar-chart-3"></i></div>
-                        <h3>Analytics Pro</h3>
-                        <p>Reportes detallados y predicciones de ocupación basadas en datos reales.</p>
+    <!-- 3. LIVE STATS SECTION -->
+    <section class="live-stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card glass-panel reveal-up" style="transition-delay: 0.1s">
+                    <div class="stat-icon"><i data-lucide="car"></i></div>
+                    <div class="stat-info">
+                        <h3 class="stat-value" id="live-disp">42</h3>
+                        <p class="stat-label">Espacios Disponibles</p>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- Pricing Section -->
-        <section id="precios" class="pricing">
-            <div class="container">
-                <div class="section-header reveal">
-                    <h2>Planes que Crecerán Contigo</h2>
-                    <p>Elige el nivel de control que tu estacionamiento merece.</p>
+                <div class="stat-card glass-panel reveal-up" style="transition-delay: 0.2s">
+                    <div class="stat-icon"><i data-lucide="scan-line"></i></div>
+                    <div class="stat-info">
+                        <h3 class="stat-value" id="live-detec">318</h3>
+                        <p class="stat-label">Vehículos Detectados</p>
+                    </div>
                 </div>
-                <div class="pricing-grid">
-                    <!-- Basic Plan -->
-                    <div class="pricing-card reveal" style="transition-delay: 0.1s;">
-                        <div class="plan-name">Básico</div>
-                        <div class="plan-price">$29<span>/mes</span></div>
-                        <ul class="plan-features">
-                            <li><i data-lucide="check"></i> 1 Zona de Parking</li>
-                            <li><i data-lucide="check"></i> Hasta 50 Plazas</li>
-                            <li><i data-lucide="check"></i> 5 Dispositivos</li>
-                            <li><i data-lucide="check"></i> 3 Usuarios</li>
-                        </ul>
-                        <button class="btn-plan" data-plan-id="1">Suscribirse</button>
+                <div class="stat-card glass-panel reveal-up" style="transition-delay: 0.3s">
+                    <div class="stat-icon"><i data-lucide="clock"></i></div>
+                    <div class="stat-info">
+                        <h3 class="stat-value">2 min</h3>
+                        <p class="stat-label">Tiempo Promedio</p>
                     </div>
-
-                    <!-- Pro Plan (Recommended) -->
-                    <div class="pricing-card recommended reveal" style="transition-delay: 0.2s;">
-                        <div class="badge">Recomendado</div>
-                        <div class="plan-name">Profesional</div>
-                        <div class="plan-price">$79<span>/mes</span></div>
-                        <ul class="plan-features">
-                            <li><i data-lucide="check"></i> 5 Zonas de Parking</li>
-                            <li><i data-lucide="check"></i> Hasta 200 Plazas</li>
-                            <li><i data-lucide="check"></i> 20 Dispositivos</li>
-                            <li><i data-lucide="check"></i> 10 Usuarios</li>
-                            <li><i data-lucide="check"></i> Soporte Prioritario</li>
-                        </ul>
-                        <button class="btn-plan primary" data-plan-id="2">Empezar PRO</button>
-                    </div>
-
-                    <!-- Enterprise Plan -->
-                    <div class="pricing-card reveal" style="transition-delay: 0.3s;">
-                        <div class="plan-name">Empresarial</div>
-                        <div class="plan-price">$199<span>/mes</span></div>
-                        <ul class="plan-features">
-                            <li><i data-lucide="check"></i> Zonas Ilimitadas</li>
-                            <li><i data-lucide="check"></i> Plazas Ilimitadas</li>
-                            <li><i data-lucide="check"></i> Dispositivos Ilimitados</li>
-                            <li><i data-lucide="check"></i> Usuarios Ilimitados</li>
-                            <li><i data-lucide="check"></i> API Personalizada</li>
-                        </ul>
-                        <button class="btn-plan" data-plan-id="3">Contactar</button>
+                </div>
+                <div class="stat-card glass-panel reveal-up" style="transition-delay: 0.4s">
+                    <div class="stat-icon"><i data-lucide="check-circle"></i></div>
+                    <div class="stat-info">
+                        <h3 class="stat-value text-gradient">98%</h3>
+                        <p class="stat-label">Precisión del Sistema</p>
                     </div>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
 
+    <!-- 4. PROBLEM SECTION -->
+    <section class="problem-section">
+        <div class="container">
+            <div class="section-header reveal-up">
+                <h2 class="section-title">El estacionamiento universitario tradicional es <span class="text-gradient-red">lento, caótico e ineficiente</span></h2>
+            </div>
+            <div class="problem-grid">
+                <div class="problem-item reveal-up">
+                    <div class="problem-icon">❌</div>
+                    <p>Buscar espacios consume tiempo valioso</p>
+                </div>
+                <div class="problem-item reveal-up" style="transition-delay: 0.1s">
+                    <div class="problem-icon">❌</div>
+                    <p>Congestión vehicular en horas pico</p>
+                </div>
+                <div class="problem-item reveal-up" style="transition-delay: 0.2s">
+                    <div class="problem-icon">❌</div>
+                    <p>Mala administración del espacio</p>
+                </div>
+                <div class="problem-item reveal-up" style="transition-delay: 0.3s">
+                    <div class="problem-icon">❌</div>
+                    <p>Falta de monitoreo en tiempo real</p>
+                </div>
+                <div class="problem-item reveal-up" style="transition-delay: 0.4s">
+                    <div class="problem-icon">❌</div>
+                    <p>Poca seguridad para los vehículos</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. SOLUCIÓN -->
+    <section class="solution-section">
+        <div class="container">
+            <div class="section-header reveal-up">
+                <h2 class="section-title">UCE Parking automatiza todo el ecosistema del estacionamiento</h2>
+            </div>
+            <div class="solution-grid">
+                <div class="solution-card glass-panel reveal-up">
+                    <div class="s-icon">🚗</div>
+                    <h3>Detección inteligente</h3>
+                    <p>Sensores IoT detectan espacios libres al instante.</p>
+                </div>
+                <div class="solution-card glass-panel reveal-up" style="transition-delay: 0.1s">
+                    <div class="s-icon">📱</div>
+                    <h3>Reservas en línea</h3>
+                    <p>Aparta tu espacio desde el móvil antes de llegar.</p>
+                </div>
+                <div class="solution-card glass-panel reveal-up" style="transition-delay: 0.2s">
+                    <div class="s-icon">📊</div>
+                    <h3>Dashboard en tiempo real</h3>
+                    <p>Monitoreo centralizado y reportes analíticos.</p>
+                </div>
+                <div class="solution-card glass-panel reveal-up" style="transition-delay: 0.3s">
+                    <div class="s-icon">🔔</div>
+                    <h3>Alertas automáticas</h3>
+                    <p>Notificaciones instantáneas de eventos y accesos.</p>
+                </div>
+                <div class="solution-card glass-panel reveal-up" style="transition-delay: 0.4s">
+                    <div class="s-icon">🧠</div>
+                    <h3>IA Analítica</h3>
+                    <p>Optimización inteligente del flujo vehicular.</p>
+                </div>
+                <div class="solution-card glass-panel reveal-up" style="transition-delay: 0.5s">
+                    <div class="s-icon">☁️</div>
+                    <h3>Plataforma Cloud</h3>
+                    <p>Acceso seguro desde cualquier lugar y dispositivo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. CÓMO FUNCIONA -->
+    <section class="how-it-works">
+        <div class="container">
+            <div class="section-header reveal-up">
+                <h2 class="section-title">Flujo de Funcionamiento</h2>
+                <p class="section-subtitle">Operación fluida, desde la entrada hasta la salida.</p>
+            </div>
+            <div class="flow-container reveal-up">
+                <div class="flow-step">
+                    <div class="step-num">1</div>
+                    <h4>Sensores detectan</h4>
+                    <p>Vehículos ingresan</p>
+                </div>
+                <div class="flow-line"></div>
+                <div class="flow-step">
+                    <div class="step-num">2</div>
+                    <h4>Datos al servidor</h4>
+                    <p>Transmisión RF/IoT</p>
+                </div>
+                <div class="flow-line"></div>
+                <div class="flow-step">
+                    <div class="step-num">3</div>
+                    <h4>IA analiza</h4>
+                    <p>Disponibilidad</p>
+                </div>
+                <div class="flow-line"></div>
+                <div class="flow-step">
+                    <div class="step-num">4</div>
+                    <h4>Dashboard actualiza</h4>
+                    <p>Visualización en vivo</p>
+                </div>
+                <div class="flow-line"></div>
+                <div class="flow-step">
+                    <div class="step-num">5</div>
+                    <h4>Usuario accede</h4>
+                    <p>Reserva o visualiza</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. FEATURES SECTION -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header reveal-up">
+                <h2 class="section-title">Características Principales</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card glass-panel reveal-up">
+                    <i data-lucide="radio" class="f-icon"></i>
+                    <h3>Sensores IoT</h3>
+                    <p>Detección automática de alta precisión.</p>
+                </div>
+                <div class="feature-card glass-panel reveal-up" style="transition-delay: 0.1s">
+                    <i data-lucide="brain-circuit" class="f-icon"></i>
+                    <h3>Inteligencia Artificial</h3>
+                    <p>Análisis predictivo de flujo.</p>
+                </div>
+                <div class="feature-card glass-panel reveal-up" style="transition-delay: 0.2s">
+                    <i data-lucide="map" class="f-icon"></i>
+                    <h3>Mapa interactivo</h3>
+                    <p>Visualización en vivo de cada plaza.</p>
+                </div>
+                <div class="feature-card glass-panel reveal-up" style="transition-delay: 0.3s">
+                    <i data-lucide="smartphone" class="f-icon"></i>
+                    <h3>App Responsive</h3>
+                    <p>Acceso móvil optimizado.</p>
+                </div>
+                <div class="feature-card glass-panel reveal-up" style="transition-delay: 0.4s">
+                    <i data-lucide="shield-check" class="f-icon"></i>
+                    <h3>Seguridad</h3>
+                    <p>Control de acceso y monitoreo continuo.</p>
+                </div>
+                <div class="feature-card glass-panel reveal-up" style="transition-delay: 0.5s">
+                    <i data-lucide="zap" class="f-icon"></i>
+                    <h3>Tiempo Real</h3>
+                    <p>Actualización instantánea vía WebSockets.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7.5. PRECIOS (NUEVO) -->
+    <section id="precios" class="pricing-section">
+        <div class="container">
+            <div class="section-header reveal-up">
+                <h2 class="section-title">Planes que Crecerán Contigo</h2>
+                <p class="section-subtitle">Elige el nivel de control que tu estacionamiento merece.</p>
+                
+                <!-- Success Banner -->
+                <div id="success-banner" class="success-banner glass-panel" style="display:none; margin-top: 2rem;">
+                    <h3 class="text-gradient">🎉 ¡Suscripción Activada!</h3>
+                    <p id="success-msg">Tu plan ha sido activado.</p>
+                </div>
+            </div>
+            
+            <div class="pricing-grid">
+                <!-- Básico -->
+                <div class="pricing-card glass-panel reveal-up">
+                    <h3>Básico</h3>
+                    <div class="price">$49<span>/mes</span></div>
+                    <ul>
+                        <li><i data-lucide="check"></i> 1 Zona de Parking</li>
+                        <li><i data-lucide="check"></i> Hasta 50 Plazas</li>
+                        <li><i data-lucide="check"></i> 5 Dispositivos</li>
+                        <li><i data-lucide="check"></i> Panel Web + App</li>
+                    </ul>
+                    <button class="btn btn-secondary w-full" onclick="handlePlan(2, this)">Suscribirse</button>
+                </div>
+
+                <!-- Profesional -->
+                <div class="pricing-card glass-panel recommended reveal-up" style="transition-delay: 0.1s">
+                    <div class="badge-recommended">Más Popular</div>
+                    <h3>Profesional</h3>
+                    <div class="price text-gradient">$149<span>/mes</span></div>
+                    <ul>
+                        <li><i data-lucide="check"></i> 5 Zonas de Parking</li>
+                        <li><i data-lucide="check"></i> Hasta 200 Plazas</li>
+                        <li><i data-lucide="check"></i> LPR + Sensores RF</li>
+                        <li><i data-lucide="check"></i> Reportes Excel / PDF</li>
+                    </ul>
+                    <button class="btn btn-primary btn-glow w-full" onclick="handlePlan(3, this)">Empezar PRO</button>
+                </div>
+
+                <!-- Business -->
+                <div class="pricing-card glass-panel reveal-up" style="transition-delay: 0.2s">
+                    <h3>Business</h3>
+                    <div class="price">$349<span>/mes</span></div>
+                    <ul>
+                        <li><i data-lucide="check"></i> 15 Zonas de Parking</li>
+                        <li><i data-lucide="check"></i> Hasta 500 Plazas</li>
+                        <li><i data-lucide="check"></i> API personalizada</li>
+                        <li><i data-lucide="check"></i> Webhooks avanzados</li>
+                    </ul>
+                    <button class="btn btn-secondary w-full" onclick="handlePlan(4, this)">Suscribirse Business</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. DASHBOARD SHOWCASE -->
+    <section id="dashboard" class="dashboard-showcase">
+        <div class="container">
+            <div class="section-header reveal-up">
+                <h2 class="section-title">Control total en un solo lugar</h2>
+                <p class="section-subtitle">Descubre el poder de nuestro Dashboard interactivo.</p>
+            </div>
+            
+            <!-- Real Dashboard Mockup -->
+            <div class="dash-mockup glass-panel reveal-up">
+                <div class="dash-mock-header">
+                    <div>
+                        <h3 class="dash-title">Panel Principal</h3>
+                        <p class="dash-subtitle">Visión global del sistema UCE Parking</p>
+                    </div>
+                    <div class="dash-status"><i data-lucide="check-circle" style="width:14px"></i> Operativo</div>
+                </div>
+
+                <div class="dash-stats-grid">
+                    <div class="dash-stat-card">
+                        <p class="stat-label text-emerald">Total Espacios en Uso</p>
+                        <h4 class="stat-value">124</h4>
+                        <p class="stat-subtext">De 350 plazas en 5 zonas</p>
+                        <i data-lucide="parking-circle" class="stat-icon bg-emerald"></i>
+                    </div>
+                    <div class="dash-stat-card">
+                        <p class="stat-label text-blue">Total Espacios Libres</p>
+                        <h4 class="stat-value" id="dash-libres">226</h4>
+                        <p class="stat-subtext">Disponibles para uso</p>
+                        <i data-lucide="check-circle-2" class="stat-icon bg-blue"></i>
+                    </div>
+                    <div class="dash-stat-card">
+                        <p class="stat-label text-indigo">Vehículos Estacionados</p>
+                        <h4 class="stat-value" id="dash-ocupadas">105</h4>
+                        <p class="stat-subtext">226 plazas disponibles</p>
+                        <i data-lucide="car" class="stat-icon bg-indigo"></i>
+                    </div>
+                    <div class="dash-stat-card">
+                        <p class="stat-label text-purple">Plazas Asignadas</p>
+                        <h4 class="stat-value">12</h4>
+                        <p class="stat-subtext">Para staff o uso fijo</p>
+                        <i data-lucide="user-check" class="stat-icon bg-purple"></i>
+                    </div>
+                    <div class="dash-stat-card">
+                        <p class="stat-label text-amber">Reservaciones Activas</p>
+                        <h4 class="stat-value">7</h4>
+                        <p class="stat-subtext">Espacios bloqueados</p>
+                        <i data-lucide="pie-chart" class="stat-icon bg-amber"></i>
+                    </div>
+                </div>
+
+                <div class="dash-main-grid">
+                    <!-- Ocupación Central -->
+                    <div class="dash-central-panel">
+                        <div class="dash-gradient-header">
+                            <h5><i data-lucide="map" style="width:16px"></i> Ocupación Actual del Campus</h5>
+                            <div class="dash-big-percent">
+                                <span>35%</span>
+                                <small>Capacidad comprometida</small>
+                            </div>
+                            <div class="dash-progress-bar">
+                                <div class="progress-fill bg-green" style="width: 35%"></div>
+                            </div>
+                            <div class="dash-progress-labels">
+                                <span>0%</span>
+                                <span>226 libres de 350 plazas</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+                        <div class="dash-breakdown">
+                            <div class="break-item"><p>Accesos Hoy</p><b>342</b></div>
+                            <div class="break-item"><p>Salidas Hoy</p><b>310</b></div>
+                            <div class="break-item"><p>Tickets (Act/Hoy)</p><b>45 / 120</b></div>
+                            <div class="break-item"><p>Usuarios Totales</p><b>890</b></div>
+                            <div class="break-item"><p>Vehículos Reg.</p><b>450</b></div>
+                            <div class="break-item"><p>Empleados</p><b>15</b></div>
+                            <div class="break-item"><p>Usu. Móviles</p><b>210</b></div>
+                            <div class="break-item warning"><p>Mantenimiento</p><b>2</b></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Últimos Eventos Sidebar -->
+                    <div class="dash-sidebar-events">
+                        <div class="dash-events-header">
+                            <h5><i data-lucide="history" style="width:16px"></i> Últimos Eventos</h5>
+                            <span class="live-badge"><span class="dot pulse"></span> En Vivo</span>
+                        </div>
+                        <div class="dash-events-list">
+                            <div class="dash-event-item">
+                                <div class="evt-head"><span>Entrada Vehículo</span> <small>Hace 2 min</small></div>
+                                <p>Ingreso autorizado en Garita Principal</p>
+                                <span class="evt-user">Juan Pérez</span>
+                            </div>
+                            <div class="dash-event-item">
+                                <div class="evt-head"><span>Reserva Creada</span> <small>Hace 15 min</small></div>
+                                <p>Reserva confirmada en Zona Docentes</p>
+                                <span class="evt-user">Ana Gómez</span>
+                            </div>
+                            <div class="dash-event-item">
+                                <div class="evt-head"><span>Salida Vehículo</span> <small>Hace 22 min</small></div>
+                                <p>Salida registrada en Barrera Norte</p>
+                                <span class="evt-user">Carlos López</span>
+                            </div>
+                            <div class="dash-event-item">
+                                <div class="evt-head"><span>Ticket Emitido</span> <small>Hace 45 min</small></div>
+                                <p>Visitante - Plaza 10B</p>
+                                <span class="evt-user">Guardia Turno 1</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. HARDWARE & TECNOLOGÍA -->
+    <section id="tecnologia" class="tech-section">
+        <div class="container">
+            <div class="section-header reveal-up">
+                <h2 class="section-title">Stack Tecnológico y Hardware</h2>
+            </div>
+            <div class="tech-grid">
+                <div class="tech-card glass-panel reveal-up">
+                    <h3 class="text-gradient">Hardware</h3>
+                    <ul>
+                        <li><i data-lucide="cpu"></i> ESP32 & Arduino</li>
+                        <li><i data-lucide="radio-receiver"></i> Sensores IR / RF</li>
+                        <li><i data-lucide="camera"></i> Cámaras ANPR LPR</li>
+                    </ul>
+                </div>
+                <div class="tech-card glass-panel reveal-up" style="transition-delay: 0.2s">
+                    <h3 class="text-gradient">Software</h3>
+                    <ul>
+                        <li><i data-lucide="code-2"></i> React & Next.js</li>
+                        <li><i data-lucide="server"></i> Node.js & APIs</li>
+                        <li><i data-lucide="network"></i> WebSockets</li>
+                    </ul>
+                </div>
+                <div class="tech-card glass-panel reveal-up" style="transition-delay: 0.4s">
+                    <h3 class="text-gradient">Inteligencia</h3>
+                    <ul>
+                        <li><i data-lucide="scan-face"></i> Detección vehicular</li>
+                        <li><i data-lucide="trending-up"></i> Predicción de tráfico</li>
+                        <li><i data-lucide="database"></i> Analítica en nube</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. BENEFICIOS -->
+    <section class="benefits-section">
+        <div class="container">
+            <div class="section-header reveal-up">
+                <h2 class="section-title">Beneficios para todos</h2>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-col reveal-up">
+                    <div class="b-icon">🎓</div>
+                    <h3>Para Estudiantes</h3>
+                    <ul>
+                        <li>Menos tiempo buscando</li>
+                        <li>Reservas rápidas</li>
+                        <li>Experiencia sin fricción</li>
+                    </ul>
+                </div>
+                <div class="benefit-col reveal-up" style="transition-delay: 0.2s">
+                    <div class="b-icon">🏛️</div>
+                    <h3>Para la Universidad</h3>
+                    <ul>
+                        <li>Control centralizado</li>
+                        <li>Datos analíticos valiosos</li>
+                        <li>Mejor experiencia en campus</li>
+                    </ul>
+                </div>
+                <div class="benefit-col reveal-up" style="transition-delay: 0.4s">
+                    <div class="b-icon">🛡️</div>
+                    <h3>Para Seguridad</h3>
+                    <ul>
+                        <li>Monitoreo en tiempo real</li>
+                        <li>Alertas automáticas de acceso</li>
+                        <li>Registro histórico auditable</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. TESTIMONIOS -->
+    <section class="testimonials-section">
+        <div class="container">
+            <div class="testimonial-card glass-panel reveal-up">
+                <div class="quote-icon">"</div>
+                <p class="quote-text">El sistema reduce significativamente el tiempo de búsqueda de estacionamiento, mejorando la puntualidad y reduciendo el estrés en el campus.</p>
+                <div class="quote-author">
+                    <div class="author-avatar">P</div>
+                    <div class="author-info">
+                        <h4>Pruebas Piloto</h4>
+                        <span>Validación Académica UCE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 12. CTA FINAL -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-box glass-panel reveal-up">
+                <h2>Transformando el estacionamiento universitario con tecnología inteligente</h2>
+                <p>Únete a la revolución de la movilidad en campus.</p>
+                <a href="http://localhost:3000" target="_blank" class="btn btn-primary btn-lg btn-glow mt-4">Solicitar Demo</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 13. FOOTER -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <span class="logo-text">UCE<span>Parking</span></span>
-                    <p>La revolución del estacionamiento inteligente.</p>
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <i data-lucide="parking-circle" class="logo-icon"></i>
+                        <span class="logo-text">UCE<span>Parking</span></span>
+                    </div>
+                    <p>La forma moderna de gestionar estacionamientos universitarios.</p>
                 </div>
                 <div class="footer-links">
-                    <h4>Sistema</h4>
+                    <h4>Producto</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#dashboard">Dashboard</a></li>
+                        <li><a href="#tecnologia">Tecnología</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Recursos</h4>
                     <ul>
                         <li><a href="#">Documentación</a></li>
-                        <li><a href="#">Estado de Red</a></li>
-                        <li><a href="#">Seguridad</a></li>
+                        <li><a href="#">API</a></li>
+                        <li><a href="#">Soporte</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Proyecto</h4>
+                    <ul>
+                        <li><a href="#">Universidad Central del Este</a></li>
+                        <li><a href="#">Ingeniería en Software</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacidad</a></li>
+                        <li><a href="#">Términos</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 UCE Parking. Todos los derechos reservados.</p>
+                <p>&copy; 2026 UCE Parking. Proyecto Académico.</p>
             </div>
         </div>
     </footer>
 
     <script src="script.js"></script>
-    <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
-    </script>
 </body>
 </html>
